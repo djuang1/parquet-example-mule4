@@ -1,0 +1,7 @@
+{
+  "sampleData": {
+    "6ca23337-8cdb-4f75-8c17-945e037b9611": {
+      "payload": "sample_data/list_avro.avro"
+    }
+  }
+}

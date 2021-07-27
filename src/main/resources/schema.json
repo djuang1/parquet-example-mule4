@@ -1,0 +1,27 @@
+{
+    "type": "record",
+    "name": "userInfo",
+    "namespace": "my.example",
+    "fields": [
+        {
+            "name": "username",
+            "type": "string",
+            "default": "NONE"
+        },
+        {
+            "name": "age",
+            "type": "int",
+            "default": -1
+        },
+        {
+            "name": "phone",
+            "type": "string",
+            "default": "NONE"
+        },
+        {
+            "name": "housenum",
+            "type": "string",
+            "default": "NONE"
+        }
+    ]
+}

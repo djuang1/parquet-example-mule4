@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:parquet="http://www.mulesoft.org/schema/mule/parquet"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/parquet http://www.mulesoft.org/schema/mule/parquet/current/mule-parquet.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="9953cae2-30bc-40c3-8f88-943d961e1a59" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="parquet-exampleFlow1" doc:id="df222297-fb92-4608-af07-adb40c902a8a">
+		<http:listener doc:name="/write" doc:id="2fb948f1-da21-46ee-bffc-488cd716167c" config-ref="HTTP_Listener_config" path="/write" />
+		<ee:transform doc:name="Transform Message" doc:id="a9696bec-eea2-47e4-b7e7-9ad8d9384b36">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/avro schemaUrl="classpath://schema.json"
+---
+[{
+    username: "Mariano",
+    age: 35,
+    phone: "213",
+    housenum: "123"
+},
+{
+    username: "Leandro",
+    age: 29,
+    phone: "213",
+    housenum: "123"
+},
+{
+    username: "Christian",
+    age: 25,
+    phone: "213",
+    housenum: "123"
+}]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="91278736-4257-45fa-b077-864eedaced8c" mimeType='application/avro; schemaurl="classpath://schema.json"' />
+		<parquet:write-avro-to-parquet doc:name="Write Avro to Parquet File" doc:id="6c5f29df-bcb4-457f-bd27-e5eff51b60d7" parquetFilePath='#["${mule.home}/apps/${app.name}/test.parquet"]'/>
+		<ee:transform doc:name="Transform Message" doc:id="1c943b53-5acc-452c-ae26-ea69567ee849" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="parquet-exampleFlow" doc:id="aa3698bc-4ee7-425b-8e6b-8a6f459717c6" >
+		<http:listener doc:name="/read" doc:id="a701c90d-ba44-4648-bd25-5fcc94c8af29" config-ref="HTTP_Listener_config" path="/read"/>
+		<parquet:read-parquet doc:name="Read Parquet File" doc:id="bbe072a1-5a38-4941-83f0-aa9557f2c551" parquetFilePath='#["${mule.home}/apps/${app.name}/test.parquet"]'/>
+		<ee:transform doc:name="Transform Message" doc:id="0296dc71-ea95-456c-8f3b-9de748232dc4" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
